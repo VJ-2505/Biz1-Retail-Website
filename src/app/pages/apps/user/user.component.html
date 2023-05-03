@@ -1,0 +1,145 @@
+<div [hidden]="!show">
+    <div class="cui__utils__heading">
+        <strong style="margin-left: 37px;font-size: 23px;font-family: 'Poppins', sans-serif;">User</strong>
+    </div>
+
+    <div class="card col-lg-12" style="border-radius:11px;">
+        <div class="card-header card-header-flex">
+
+            <div class="d-flex flex-column justify-content-center mr-auto" style="width: 335px;">
+                <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+                    <input type="text" [(ngModel)]="term" nz-input placeholder="input search text"
+                        (input)="filtersearch()" />
+                </nz-input-group>
+                <ng-template #suffixIconButton>
+                    <button nz-button nzType="primary" nzSearch><i nz-icon nzType="search"></i></button>
+                </ng-template>
+            </div>
+
+            <div class="col-sm-auto row">
+
+                <div class="mx-5 py-3">
+                    <a (click)="show = !show" class="btn btn-success" href="javascript: void(0);">
+                        + Add User
+                    </a>
+                </div>
+            </div>
+        </div>
+        <nz-table #basicTable class="kit__utils__table mb-4 px-4" nzSize="small" [nzData]="getuser.users">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">
+                        <strong>
+                            Name
+                        </strong>
+                    </th>
+                    <th style="text-align: center;">
+                        <strong>
+                            Role
+                        </strong>
+                    </th>
+                    <th style="text-align: center;">
+                        <strong>
+                            Store Name
+                        </strong>
+                    </th>
+                    <th style="text-align: center;">
+                        <strong>
+                            Delete
+                        </strong>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of basicTable.data">
+                    <td>
+                        <a class="btn btn-sm btn-light kit__utils__donut--primary" (click)="editstore(item)"><strong
+                                style=" color: #05b40e;
+                                font-size: 13px;"> {{item.name}}</strong></a>
+                    </td>
+                    <td>
+                        {{item.role.name}}
+                    </td>
+                    <td>
+                        {{item.Stores}}
+                    </td>
+
+                    <td>
+                        <a style="color: red;" class="btn btn-link " (click)="deleteuser(item.id)">
+                            <i class="fe fe-trash-2"></i>
+                        </a>
+                    </td>
+
+
+
+                </tr>
+            </tbody>
+        </nz-table>
+    </div>
+</div>
+
+
+
+<div [hidden]="show" class="card">
+    <div class="row" style="padding:10px;">
+        <div class="col-6">
+           
+                <strong *ngIf="userData.id==0" class="text"
+                    style="font-size: 23px;font-family: 'Poppins', sans-serif;margin-left: 34px;">Add User</strong>
+                <strong *ngIf="userData.id > 0" style="margin-left: 33px;"> Edit User:
+                    <strong class="text" style="font-size: 23px;font-family: 'Poppins', sans-serif;margin-left: 6px;">
+                        {{userData.name}}</strong>
+                </strong>
+            
+        </div>
+        <div class="col-6" >
+            <button class="btn btn-secondary btn-sm mx-10 w-20" style="width: 100px;margin-left: 314px;"
+                (click)="back()"><i nz-icon nzType="left" style="margin-right: 6px;"></i>Back</button>
+
+            <button class="btn btn-success btn-sm mx-10 w-20" style="width: 112px;margin-left: 26px;"
+                (click)=" saveuser()">Save</button>
+
+
+        </div>
+    </div>
+
+
+
+    <div class="card col-xl-10 ml-5" style="margin-top: 26px;">
+
+
+
+        <div class="car-body p-4 mr-1">
+            <div class="form-group">
+                <strong for="" class="mb-2">User Name:</strong>
+                <input class="form-control" [(ngModel)]="userData.name" />
+
+            </div>
+            <br />
+            <div class="form-group">
+                <strong for="" class="mb-2">Enter Pin:</strong>
+                <input class="form-control" [(ngModel)]="userData.pin" />
+
+
+            </div>
+            <br />
+            <strong class="mb-2">Select Role:</strong>
+            <nz-select nzAllowClear nzPlaceHolder="Select Role" [(ngModel)]="userData.roleId">
+                <nz-option *ngFor="let option of role" [nzLabel]="option.name" [nzValue]="option.id"></nz-option>
+            </nz-select>
+            <br />
+            <br>
+
+            <strong for="" class="mb-2">Select Store:</strong>
+            <nz-select *ngIf="userData" [(ngModel)]="userData.mapped_stores" nzMode="'multiple'" nzShowSearch>
+                <nz-option style="width: 522px;" *ngFor="let option of store" [nzLabel]="option.name"
+                    [nzValue]="option.id">
+                </nz-option>
+            </nz-select>
+            <br />
+
+        </div>
+    </div>
+
+
+</div>

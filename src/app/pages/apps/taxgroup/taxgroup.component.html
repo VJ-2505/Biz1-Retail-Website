@@ -1,0 +1,128 @@
+<div>
+  <div [hidden]="!show">
+    <div class="cui__utils__heading">
+      <strong style="margin-left: 37px;font-size: 23px;font-family: 'Poppins', sans-serif;">Tax-Group</strong>
+    </div>
+
+    <div class="card col-lg-12" style="border-radius:11px;">
+      <div class="card-header card-header-flex" style="padding: 25px;">
+        <div class="d-flex flex-column justify-content-center mr-auto" style="width: 335px;">
+          <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+            <input type="text" nz-input placeholder="input search text" [(ngModel)]="term" (input)="filtersearch()" />
+          </nz-input-group>
+          <ng-template #suffixIconButton>
+            <button nz-button nzType="primary" nzSearch><i nz-icon nzType="search"></i></button>
+          </ng-template>
+        </div>
+
+        <div class="col-sm-auto row">
+
+          <div class="mx-5 py-3">
+            <a class="btn btn-success" href="javascript: void(0);" (click)="show = !show">
+              + Add TaxGroup
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+
+
+
+
+      <nz-table #basicTable class="kit__utils__table mb-4" nzSize="small" [nzData]="tabledata">
+        <thead>
+          <tr>
+            <th><strong>Description</strong>
+            </th>
+            <th><strong>Tax 1</strong>
+            </th>
+            <th><strong>Tax 2</strong>
+            </th>
+            <th><strong>Tax 3</strong>
+            </th>
+            <th><strong>IsInclusive</strong>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tax of basicTable.data ">
+            <td>
+              <a class="btn btn-sm btn-light kit__utils__donut--primary" (click)="editTaxgroup(tax)">
+                <strong style=" color: #05b40e;
+                font-size: 13px;"> {{tax.description}}</strong>
+              </a>
+            </td>
+            <td>
+              {{tax.tax1}}
+            </td>
+            <td>
+              {{tax.tax2}}
+            </td>
+            <td>
+              {{tax.tax3}}
+            </td>
+            <td>
+              <span *ngIf="tax.isInclusive" class="text-success">YES</span>
+              <span *ngIf="!tax.isInclusive" class="text-danger">NO</span>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+    </div>
+    <!-- </div> -->
+  </div>
+  <!-- Card Hide & Show -->
+  <!-- <div class="col-lg-8 mt-lg-0 mt-4" style="margin-left: 188px;background-color: #f9f9f9;"> -->
+
+  <div [hidden]="show " class="card">
+    <h5 class="ml-3 mt-3">
+      <strong class="text" style="font-size: 23px;font-family: 'Poppins', sans-serif;margin-left: 34px;"
+        *ngIf="taxgroup.id==0">Add TaxGroup</strong>
+      <strong *ngIf="taxgroup.id > 0" style="margin-left: 33px;">Edit TaxGroup: <strong class="text"
+          style="font-size: 23px;font-family: 'Poppins', sans-serif;margin-left: 6px;">{{taxgroup.description}}</strong>
+      </strong>
+    </h5>
+    <div class="card col-xl-10 ml-5" style="margin-top: 26px;">
+      <div class="card-body">
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="baseFullname">Description</label>
+          <div class="col-md-6">
+            <input type="text" class="form-control" [(ngModel)]="taxgroup.description"
+              placeholder="Enter Description..." />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label">Tax 1</label>
+          <div class="col-md-6">
+            <input type="number" class="form-control" [(ngModel)]="taxgroup.tax1" placeholder="Enter Tax" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label">Tax 2</label>
+          <div class="col-md-6">
+            <input type="number" class="form-control" [(ngModel)]="taxgroup.tax2" placeholder="Enter Tax" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label">Tax 3</label>
+          <div class="col-md-6">
+            <input type="number" class="form-control" [(ngModel)]="taxgroup.tax3" placeholder="Enter Tax" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label">IsInclusive</label>
+          <div class="col-md-6">
+            <input type="checkbox" [(ngModel)]="taxgroup.isInclusive" placeholder="Enter Tax" />
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary px-3" (click)="back()">
+          <i nz-icon nzType="left" style="margin-right: 12px;"></i>Back</button>
+        <button type="button" class="btn btn-success px-5 pull-right" (click)="addTax()">Save</button>
+      </div>
+    </div>
+
+  </div>
+  <!-- </div> -->
+</div>

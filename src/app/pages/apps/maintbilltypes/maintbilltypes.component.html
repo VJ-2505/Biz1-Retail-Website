@@ -1,0 +1,568 @@
+<div class="cui__utils__heading" *ngIf="isShown">
+    <div class="row">
+        <div class="col-xl-6 pt-5">
+            <strong>Maintenance Bill Activities - Index</strong>
+        </div>
+        <!-- <button type="button" style="width: 90px;height: 30px; margin-left: 55%;" class="btn btn-squared btn-success">CreateNew</button>  -->
+        <div ngbDropdown class="col-xl-3 pt-5">
+            <button class="btn btn-success pull-right" ngbDropdownToggle id="dropdownBasic5">
+                <!-- <option value=null ><strong>CreateNew</strong></option>
+                  <option *ngFor="let pcat of BillStatus" value="{{pcat.id}}">{{pcat.status}}</option> -->Create New
+            </button>
+            <div ngbDropdownMenu aria-labelledby="dropdownBasic5">
+                <button ngbDropdownItem (click)="create()">CreateNew</button>
+                <!-- <button ngbDropdownItem>Another Action</button> -->
+            </div>
+        </div>
+        <div class="col-xl-3 pt-5">
+            <button type="button" class="btn btn-squared btn-primary  pull-right" (click)="advancesearch(show)">
+                <i class="fa fa-search"></i> Advance Search
+            </button>
+        </div>
+
+        <div class="card" style="background-color: aliceblue;margin-top: 25px;" *ngIf="visibletable === show">
+            <div class="row" style="height: 150px; margin-top: 20px;">
+                <div class="col-xl-2 mt-1 text-left">
+                    <ng-template class="w-100" #asst let-r="result" let-t="term">
+                        <ngb-highlight [result]="r.description" [term]="t"></ngb-highlight>
+                    </ng-template>
+                    <div style="height: 84%; position: relative;margin-left: 7px;">
+                        <input id="typeahead-template" type="number" class="form-control" placeholder="Maintenance Id"
+                            #instance="ngbTypeahead" [ngbTypeahead]="assetsearch" [resultTemplate]="asst"
+                            [inputFormatter]="assetformatter" (selectItem)="assetselectedItem($event.item)"
+                            autofocus="autofocus" (keyup.enter)="getasset()">
+
+                    </div>
+                </div>
+                <br>
+                <div class="col-xl-2 mt-1 text-left">
+                    <div>
+                        <ng-template class="w-100" #vrd let-r="result" let-t="term">
+                            <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+                        </ng-template>
+                        <div style="height: 84%; position: relative;">
+                            <input id="typeahead-template" #vendorinputs #instance="ngbTypeahead" type="text"
+                                #vendorautocomplete autocomplete="on" class="form-control" placeholder="Search Vendor"
+                                [ngbTypeahead]="vensearch" [resultTemplate]="vrd" [inputFormatter]="venformatter"
+                                (selectItem)="venselectedItem($event.item)" (keyup.enter)="getvendors()" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div>
+                        <ng-template class="w-100" #ard let-r="result" let-t="term">
+                            <ngb-highlight [result]="r.description" [term]="t"></ngb-highlight>
+                        </ng-template>
+                        <div style="height: 84%; position: relative;">
+                            <input id="typeahead-template" #assetinput #instance="ngbTypeahead" type="text"
+                                #assetautocomplete autocomplete="on" class="form-control" placeholder="Search Asset"
+                                [ngbTypeahead]="search" [resultTemplate]="ard" [inputFormatter]="formatter"
+                                (selectItem)="selectedItem($event.item)" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <input type="text" class="form-control" placeholder="Search Asset Text">
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <ng-template class="w-100" #vndr let-r="result" let-t="term">
+                        <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+                    </ng-template>
+                    <div style="height: 84%; position: relative;">
+                        <input type="text" class="form-control" placeholder="Select Bill Type">
+                    </div>
+                </div>
+
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div style="height:84%; position: relative; margin-right: 7px;">
+                        <input type="text" class="form-control" placeholder="Search Bill Type Text"
+                            (keyup.enter)="getfrequency()">
+                    </div>
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div style="height:84%; position: relative;margin-left: 7px;">
+                        <select class="form-control" [(ngModel)]="fqtys" #frqty (keyup.enter)="getBillData()">
+                            <option value="null">Select Frequency Type</option>
+                            <option *ngFor="let fqty of frequencytype" value="{{fqty.id}}">{{fqty.description}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div style="height:84%; position: relative;">
+                        <input type="number" #famount class="form-control" placeholder="From Amount"
+                            (keyup.enter)="getBillData()">
+                    </div>
+
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div style="height:84%; position: relative;">
+                        <input type="number" #upto class="form-control" placeholder="Upto Amount">
+                    </div>
+                </div>
+
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div style="height:84%; position: relative;">
+                        <select class="form-control">
+                            <option value="null">Active</option>
+                            <option value="">Not Use In</option>
+                            <option value="">Show All Records</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 mt-l text-left">
+                    <div style="height: 84%; position: relative;">
+                        <select class="form-control">
+                            <option value=""> Show 100 Records </option>
+                            <option value=""> Show 1 Records </option>
+                            <option value="">Show 1000 Records </option>
+                            <option value="">Show All Records </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div style="height: 84%; position: relative;margin-right: 7px;">
+                        <select class="form-control">
+                            <option value="">Select Duration </option>
+                            <option value="">This Week</option>
+                            <option value="">Last Week</option>
+                            <option value="">This Month</option>
+                            <option value="">Last Month</option>
+                            <option value="">Today</option>
+                            <option value="">Yesterday</option>
+                            <option value="">Custom</option>
+                            <option value="">Custom Month </option>
+                            <option value="">Last_7_Days</option>
+                            <option value="">Last_30_Days</option>
+                            <option value="">Last_N_Days</option>
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div style="height: 84%; position: relative ;margin-left: 35px;">
+                        <button type="button" class="btn btn-squared btn-success" [(ngModel)]="id"
+                            (click)="OverallSearch()">Search</button>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 mt-1 text-left">
+                    <div style="height: 84%; position: relative ;margin-left: 16%;">
+                        <button type="button" class="btn btn-danger" (click)="advancesearch()">Reset</button>
+                    </div>
+                </div>
+
+            </div><br>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="mb-5">
+            <nz-radio-group [(ngModel)]="value">
+                <label nz-radio nzValue="0" (click)="changerad($event.target.checked, 0)">Non Recurring</label>
+                <label nz-radio nzValue="1" (click)="changerad($event.target.checked, 1)">Recurring</label>
+            </nz-radio-group>
+        </div>
+        <br>
+        <div class="col-xl-4 pt-6">
+            <button type="button" class="btn btn-squared btn-success  pull-right" (click)="generatebill()">Generate
+                Bill</button>
+        </div>
+        <br>
+        <div class="col-xl-2 pt-6">
+            <button type="button" class="btn btn-squared btn-success  pull-right">Generate Bill And Pay</button>
+        </div>
+    </div>
+</div>
+
+<!-- Non Recurring -->
+<div class="card" >
+    <!-- <div  *ngIf="isrecurring"> -->
+    <div class="card-header card-header-flex" *ngIf="isNon">
+        <div class="d-flex flex-column justify-content-center mr-auto">
+            <!-- <input type="text" class="form-control" placeholder="input search text" [(ngModel)]="term" (input)="filtersearch()"
+                style="width: 250px;"> -->
+            <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+                <input type="text" nz-input placeholder="input search text" (input)="filtersearch()"
+                    [(ngModel)]="term" />
+            </nz-input-group>
+            <ng-template #suffixIconButton>
+                <button nz-button nzType="primary" nzSearch><i nz-icon nzType="search"></i></button>
+            </ng-template>
+        </div>
+    </div>
+    <nz-table #basicTable [nzData]="PurchaseDatatest" class="kit__utils__table mb-4" nzSize="small" *ngIf="isNon">
+        <thead>
+            <tr>
+                <th nzShowSort [(nzSort)]="mapOfSort.maintid" (nzSortChange)="sort('maintid', $event)">
+                    <strong>Maint Id</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.assetName" (nzSortChange)="sort('assetName', $event)">
+                    <strong>Asset Name</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.location" (nzSortChange)="sort('location', $event)">
+                    <strong>Location </strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.payfor" (nzSortChange)="sort('payfor', $event)">
+                    <strong>Pay For</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.payto" (nzSortChange)="sort('payto', $event)">
+                    <strong>Pay To</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.expectedAmount" (nzSortChange)="sort('expectedAmount', $event)">
+                    <strong>Amount</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.Quantity" (nzSortChange)="sort('Quantity', $event)">
+                    <strong>Quantity</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.reference" (nzSortChange)="sort('reference', $event)">
+                    <strong>Reference</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.createdDate" (nzSortChange)="sort('createdDate', $event)">
+                    <strong>Last Generated</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.action" (nzSortChange)="sort('action', $event)">
+                    <strong>Actions </strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.isactive" (nzSortChange)="sort('isactive', $event)">
+                    <strong>Choose</strong>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let ord of basicTable.data| filter:term">
+                <td>
+                    <a class="btn btn-sm btn-light">
+                        {{ord.id}}
+                    </a>
+                </td>
+                <td>
+                    {{ord.assetName}}
+                </td>
+                <td>
+                    {{ord.location}}
+                    <!-- <div *ngFor="let ord of store">
+                        <input class="form-control" type="text" [(ngModel)]="ord.name" value=""
+                            (ngModelChange)="active($event)">
+                    </div> -->
+                </td>
+                <td>
+                    {{ord.billType}}
+                </td>
+                <td>
+                    <input class="form-control" type="text" [(ngModel)]="ord.payto" value=""
+                        (ngModelChange)="active($event)">
+
+                </td>
+                <td>
+                    <input class="form-control" type="number" [(ngModel)]="ord.expectedAmount">
+                </td>
+                <td>
+                    <input class="form-control" type="number" [(ngModel)]="ord.Quantity" value=""
+                        (ngModelChange)="active($event)">
+                </td>
+                <td>
+                    <input type="text" class="form-control" [(ngModel)]="ord.reference" value=""
+                        (ngModelChange)="active($event)">
+                </td>
+                <td>
+                    {{ord.createdDate}}
+                </td>
+                <td>
+                    <a (click)="billpayfor(ord.billId)" href="javascript: void(0);" class="btn btn-sm btn-light ">
+                        <i class="fe fa-lg fe-dollar-sign"></i>
+                    </a>
+                    <!-- <a href="javascript: void(0);" (click)="Delete(ord.billId)"
+                        class="btn btn-sm btn-light pull-left" slot="actions">
+                        <i class="fe fe-trash mr-1"></i>
+                    </a> -->
+                    <a href="javascript: void(0);" (click)="purchasedetail(ord.billId)"
+                        class="btn btn-sm btn-light pull-left" slot="actions" style="color: blue;">
+                        <i class="fe fa-lg fe-info"></i>
+                    </a>
+                </td>
+                <td>
+                    <!-- <input class="form-control"  type="checkbox" style="width: 50%; height: 50%;" [(ngModel)]="ChooValue" 
+                            (ngModelChange)="getchoosedvalue($event.target)"> -->
+
+                    <!-- <input type="checkbox" [(ngModel)]="ord.isactive" (click)="active(ord.id, !ord.isactive)"> -->
+
+                    <label nz-checkbox [checked]="checkbox" [(ngModel)]="ord.isactive" value="" name="example_name"
+                        (change)="active($event.target.checked)">
+                    </label>
+                </td>
+
+            </tr>
+        </tbody>
+    </nz-table>
+    <!-- </div> -->
+</div>
+
+
+<!-- Recurring table -->
+<div class="card" >
+
+    <div class="card-header card-header-flex" *ngIf="isRecurg">
+        <div class="d-flex flex-column justify-content-center mr-auto">
+
+            <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+                <input type="text" nz-input placeholder="input search text" />
+            </nz-input-group>
+            <ng-template #suffixIconButton>
+                <button nz-button nzType="primary" nzSearch><i nz-icon nzType="search"></i></button>
+            </ng-template>
+        </div>
+    </div>
+    <nz-table #basicTable class="kit__utils__table mb-4" nzSize="small" [nzData]="recurring" *ngIf="isRecurg">
+        <thead>
+            <tr>
+                <th nzShowSort [(nzSort)]="mapOfSort.maintid" (nzSortChange)="sort('maintid', $event)">
+                    <strong>Maint Id</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.assetName" (nzSortChange)="sort('assetName', $event)">
+                    <strong>Asset Name</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.location" (nzSortChange)="sort('location', $event)">
+                    <strong>Location </strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.payfor" (nzSortChange)="sort('payfor', $event)">
+                    <strong>Pay For</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.payto" (nzSortChange)="sort('payto', $event)">
+                    <strong>Pay To</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.expectedAmount" (nzSortChange)="sort('expectedAmount', $event)">
+                    <strong>Amount</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.lastrecur" (nzSortChange)="sort('Quantity', $event)">
+                    <strong>Freq Type</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.reference" (nzSortChange)="sort('reference', $event)">
+                    <strong>Last Recur</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.createdDate" (nzSortChange)="sort('createdDate', $event)">
+                    <strong>Reference</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.lastgenerated" (nzSortChange)="sort('lastgenerated', $event)">
+                    <strong>Last Generated</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.action" (nzSortChange)="sort('action', $event)">
+                    <strong>Action</strong>
+                </th>
+                <th nzShowSort [(nzSort)]="mapOfSort.isactive" (nzSortChange)="sort('isactive', $event)">
+                    <strong>Choose</strong>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let rec of basicTable.data">
+                <td>
+                    <a class="btn btn-sm btn-light">{{rec.id}}</a>
+
+                </td>
+                <td>
+                    {{rec.assetName}}
+                </td>
+                <td>
+                    {{rec.location}}
+                </td>
+                <td>
+                    {{rec.billType}}
+                </td>
+                <td>
+                    <input type="text" class="form-control">
+                </td>
+                <td>
+                    <input type="number" class="form-control" [(ngModel)]="rec.expectedAmount">
+                </td>
+                <td>
+                    {{rec.frequency}}
+                </td>
+                <td>
+                    {{rec.createdDate}}
+                </td>
+                <td>
+                    <input type="text" class="form-control">
+                </td>
+                <td>
+
+                </td>
+                <td>
+                    <a href="javascript: void(0);" class="btn btn-sm btn-light ">
+                        <i class="fe fa-lg fe-dollar-sign"></i>
+                    </a>
+
+                    <a href="javascript: void(0);" class="btn btn-sm btn-light pull-left" slot="actions"
+                        style="color: blue;">
+                        <i class="fe fa-lg fe-info"></i>
+                    </a>
+                </td>
+                <td>
+                    <input type="checkbox">
+                </td>
+
+            </tr>
+        </tbody>
+    </nz-table>
+</div>
+
+
+
+<!-- Create New -->
+<div class="cui__utils__heading" *ngIf="isCreate">
+    <div class="col-xl-6 pt-3">
+        <strong>Add Maintenance Bills</strong>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body" *ngIf="isCreate" style="margin-left: 10%;">
+        <div class="form-group row">
+            <!-- <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">Maintenance Bill Type<span style="color: red;">*</span></label>
+        <div class="col-md-3 pt-2">
+            <input type="text" class="form-control" name="example_name" value="" placeholder="Select Asset Type"
+            [ngClass]="{'is-invalid': submitted && account.Description == ''}" />
+            <span *ngIf="submitted && asset.Description == ''" class="text-danger">Maintenance Bill Type cannot be empty*</span>
+        </div> -->
+            <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">Maintenance
+                Bill
+                Type<span style="color: red;">*</span></label>
+            <ng-template class="w-100" #rt let-r="result" let-t="term">
+                <ngb-highlight [result]="r.description" [term]="t"></ngb-highlight>
+            </ng-template>
+            <div class="col-md-3 pt-2">
+                <input id="typeahead-template" [(ngModel)]="mainttypeid" #productautocomplete style="height: 84%;"
+                    #instance="ngbTypeahead" type="text" class="form-control" placeholder="Search MaintBill Type"
+                    [ngbTypeahead]="search" [resultTemplate]="rt" [inputFormatter]="formatter"
+                    (selectItem)="selectedItem($event.item)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">Asset Name<span
+                    style="color: red;">*</span></label>
+            <ng-template class="w-100" #rrt let-rr="result" let-t="term">
+                <ngb-highlight [result]="rr.description" [term]="t"></ngb-highlight>
+            </ng-template>
+            <div class="col-md-3 pt-2">
+                <input id="typeahead-template" #productautocomplete style="height: 84%;" #instance="ngbTypeahead"
+                    type="text" class="form-control" placeholder="Search Asset" [ngbTypeahead]="assetsearch"
+                    [resultTemplate]="rrt" [inputFormatter]="assetformatter"
+                    (selectItem)="assetselectedItem($event.item)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">Maintenance
+                Type<span style="color: red;">*</span></label>
+            <div class="col-md-3 pt-2">
+                <select class="form-control" [(ngModel)]="mainttypeId" (ngModelChange)="getmaintTypeid($event)">
+                    <!-- <option value=null disabled>Select MaintenanceType</option> -->
+                    <option value=1 (click)="getmaintTypeid()">Recurring</option>
+                    <option value=2 (click)="getmaintTypeid()">Non Recurring</option>
+                </select>
+            </div>
+        </div>
+
+        <div [hidden]="add ">
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">
+                    Start Date</label>
+                <div class="col-md-3 pt-2">
+                    <!-- <nz-date-picker (ngModelChange)="onChange($event)" style="height: 35px;
+                width: 99%; border-radius: 4px;">
+                </nz-date-picker> -->
+                    <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" style="height: 36px;
+                width: 100%; border-radius: 4px;"></nz-range-picker>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">
+                    Frequency</label>
+                <div class="col-md-3 pt-2">
+                    <input type="number" class="form-control" [(ngModel)]="FrequencyTypeId" name="example_name" value=""
+                        (ngModelChange)="FrequencyType()" placeholder="Enter Frequency" />
+                </div>
+                <div class="col-md-3 pt-2">
+                    <select class="form-control" [(ngModel)]="description">
+                        <option *ngFor="let fqty of frequencytype" value="{{fqty.id}}">{{fqty.description}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- kk -->
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">Exepected
+                Amount</label>
+            <div class="col-md-3 pt-2">
+                <input type="number" class="form-control" [(ngModel)]="expectedamount" name="example_name" value=""
+                    placeholder="Enter Amount" (keyup.enter)="show()" />
+            </div>
+        </div>
+        <!-- 
+        <div class="form-group row" *ngIf="visible === index">
+            <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">
+                Amount</label>
+            <div class="col-md-3 pt-2">
+                <input type="number" class="form-control"  name="example_name" value=""
+                    placeholder="Enter Amount" />
+            </div>
+        </div> -->
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">Vendor<span
+                    style="color: red;">*</span></label>
+            <ng-template class="w-100" #vrt let-vr="result" let-t="term">
+                <ngb-highlight [result]="vr.name" [term]="t"></ngb-highlight>
+            </ng-template>
+            <div class="col-md-3 pt-2">
+                <input id="typeahead-template" #productautocomplete style="height: 84%;" #instance="ngbTypeahead"
+                    type="text" class="form-control" placeholder="Search Vendor" [ngbTypeahead]="vensearch"
+                    [resultTemplate]="vrt" [inputFormatter]="venformatter"
+                    (selectItem)="venselectedItem($event.item)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="formControlRange" style="font-weight: bold;">Assigned
+                To</label>
+            <div class="col-md-3 pt-2">
+                <select class="form-control" [(ngModel)]="contTypeId" (ngModelChange)="selectedcontType()">
+                    <option value=null disabled>Select ContactType</option>
+                    <option *ngFor="let pcatt of conttype" value="{{pcatt.id}}">{{pcatt.description}}</option>
+                </select>
+            </div>
+            <ng-template class="w-100" #crt let-cr="result" let-t="term">
+                <ngb-highlight [result]="cr.name" [term]="t"></ngb-highlight>
+            </ng-template>
+            <div class="col-md-3 pt-2">
+                <input id="typeahead-template" #productautocomplete style="height: 84%;" #instance="ngbTypeahead"
+                    type="text" class="form-control" placeholder="Search Contact" [ngbTypeahead]="searchcontact"
+                    [resultTemplate]="crt" [inputFormatter]="formattercontact"
+                    (selectItem)="selectedcontact($event.item)" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-2 pt-3">
+                <button type="button" class="btn btn-squared btn-primary" style="margin-right: 20%;"
+                    (click)="addback()">Back</button>
+            </div>
+            <div class="col-xl-5 pt-3">
+                <button type="button" class="btn btn-squared btn-success" style="margin-left: 60%;"
+                    (click)="savemaintbill()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

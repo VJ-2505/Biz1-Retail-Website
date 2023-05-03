@@ -1,0 +1,126 @@
+<div>
+    <div [hidden]="!show">
+        <div class="cui__utils__heading">
+            <strong style="margin-left: 37px;font-size: 23px;font-family: 'Poppins', sans-serif;">Kot-Group</strong>
+        </div>
+
+        <div class="card col-lg-7" style="border-radius:11px;margin-left: 306px;">
+            <div class="card-header card-header-flex" style="padding: 25px;">
+                <div class="d-flex flex-column justify-content-center mr-auto" style="width: 335px;">
+                    <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+                        <input type="text" nz-input placeholder=" search KotGroup" [(ngModel)]="term"
+                            (input)="filtersearch()" />
+                    </nz-input-group>
+                    <ng-template #suffixIconButton>
+                        <button nz-button nzType="primary" nzSearch><i nz-icon nzType="search"></i></button>
+                    </ng-template>
+                </div>
+
+                <div class="col-sm-auto row">
+
+                    <div class="mx-5 py-3">
+                        <a class="btn btn-success" href="javascript: void(0);" (click)="show = !show">
+                            + Add KOT
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+            <nz-table #basicTable class="kit__utils__table mb-4" nzSize="small" [nzData]="Kotgrp">
+                <thead>
+                    <tr>
+                        <th style="margin-left: 11px;"><strong>Description </strong>
+                        </th>
+                        <th></th>
+                        <th></th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let kot of basicTable.data | filter:term">
+                        <td style="padding: 11px;">
+                            {{kot.description}}
+                        </td>
+                        <td></td>
+                        <td>
+                            <a style="background-color: white;border: white; color: red;float: right;"
+                                (click)="openDetailpopup(contentdetail);deleteId = kot.id" href="javascript: void(0);"
+                                class="btn btn-sm btn-light mr-2"><span nz-icon style="font-size: 18px;" nzType="delete"
+                                    nzTheme="outline"></span></a>
+
+                            <a style="background-color: white;border: white; color: orange;float: right;"
+                                (click)="kotbyid(kot.id)" href="javascript: void(0);" class="btn btn-sm btn-light mr-2">
+                                <i style="font-size: 18px;" class="fe fe-edit mr-2"></i>
+                            </a>
+
+
+                        </td>
+                    </tr>
+                </tbody>
+            </nz-table>
+
+        </div>
+
+    </div>
+
+    <div [hidden]="show " class="card">
+        <h5 class="ml-3 mt-3">
+            <strong class="text" style="font-size: 23px;font-family: 'Poppins', sans-serif;margin-left: 34px;"
+                *ngIf="Kotgroup.id == 0">Add KOT-Group</strong>
+            <strong *ngIf="Kotgroup.id > 0" style="margin-left: 33px;">Edit KOT-Group: <strong class="text"
+                    style="font-size: 23px;font-family: 'Poppins', sans-serif;margin-left: 6px;">{{Kotgroup.description}}</strong>
+            </strong>
+        </h5>
+        <div class="card col-xl-6 " style="margin-top: 26px;margin-left: 394px;">
+            <div class="card-body">
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="baseFullname">Description :</label>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" [(ngModel)]="Kotgroup.description"
+                            [ngClass]="{'is-invalid': submitted && Kotgroup.description == ''}"
+                            placeholder="Enter Description..." />
+                    </div>
+                    <span style="margin-left: 236px;" *ngIf="submitted && Kotgroup.description == ''"
+                        class="text-danger">*KotGroup Name cannot Be
+                        Empty</span>
+                </div>
+
+                <button type="button" class="btn btn-secondary px-3" (click)="back()">
+                    <i nz-icon nzType="left" style="margin-right: 12px;"></i>Back</button>
+                <button type="button" class="btn btn-success px-5 pull-right" (click)="savekot()">Save</button>
+
+
+            </div>
+        </div>
+
+    </div>
+    <!-- </div> -->
+</div>
+
+
+<ng-template #contentdetail let-modal>
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+        <div class="modal-dialog ma-0" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"> <span style="color: orange;" nz-icon nzType="question-circle"
+                            nzTheme="outline"></span> <strong style="font-size: larger;margin-left: 12px;">Please
+                            confirm..</strong> </h5>
+                </div>
+                <div class="modal-body">
+                    <p>Do You Really Want To Delete This KOTgroup? .</p>
+                </div>
+                <div class="modal-footer" style=" height: 39px;">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close"
+                        (click)="modal.close()">No</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" aria-label="Close"
+                        (click)="getkotdelete(deleteId); modal.close()">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<div>
+
+</div>

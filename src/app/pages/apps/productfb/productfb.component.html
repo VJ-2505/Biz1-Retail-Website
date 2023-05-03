@@ -1,0 +1,537 @@
+<div>
+  <!-- Product Table list -->
+  <div [hidden]="!show">
+
+    <div class="cui__utils__heading">
+      <strong style="margin-left: 37px;font-size: 23px;font-family: 'Poppins', sans-serif;">Products</strong>
+    </div>
+
+    <div class="card col-lg-12" style="border-radius:11px;">
+      <div class="card-header card-header-flex">
+
+        <div class="d-flex flex-column justify-content-center mr-auto">
+          <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+            <input type="text" nz-input placeholder="Search Products" [(ngModel)]="term" (input)="filtersearch()"
+              style="width: 468px;" />
+          </nz-input-group>
+          <ng-template #suffixIconButton>
+            <button nz-button nzType="primary" nzSearch><i nz-icon nzType="search"></i></button>
+          </ng-template>
+        </div>
+
+        <div class="col-sm-auto row">
+          <div class="mx-5 py-3">
+            <a class="btn btn-success" (click)="openDetailpopup(contentdetail1)" href="javascript: void(0);"
+              style="margin-right:-46px; width: 100px;">
+              Import
+            </a>
+          </div>
+          <div class="mx-5 py-3">
+            <a class="btn btn-success" (click)="toAddProduct()" href="javascript: void(0);">
+              + Add Product
+            </a>
+          </div>
+          <div class="mx-5 py-3">
+            <a class="btn btn-success" href="javascript: void(0);" style="margin-left: -47px;
+          width: 100px;">
+              Export
+            </a>
+          </div>
+          <div class="form-group row py-3 mr-5">
+            <strong class="p-2" style="font-size: medium;">Show Inactive :</strong>
+            <input type="checkbox" style=" width: 18px; height: calc(1.5em + 0.75rem + 2px);"
+              (change)="changefilter($event.target.checked)">
+          </div>
+        </div>
+
+      </div>
+
+      <nz-table #basicTable class="kit__utils__table mb-4" nzSize="small" [nzData]="prod">
+        <thead>
+          <tr>
+            <th><strong>Name</strong></th>
+            <th><strong>Description</strong></th>
+            <th><strong>Category</strong></th>
+            <th><strong>Tax Group</strong></th>
+            <th><strong>Price</strong></th>
+            <th><strong>Active</strong></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of basicTable.data ">
+            <td class="font-13">
+              <span *ngIf="product.productTypeId == 1" class="badge border border-success" style="width: 20px;
+                height: 20px;">
+                <nz-badge nzStatus="success" style="margin-left:2px ;"></nz-badge>
+              </span>
+              <span *ngIf="product.productTypeId == 2" class="badge border border-danger" style="width: 20px;
+              height: 20px;">
+                <nz-badge nzStatus="error" style="margin-left:2px ;"></nz-badge>
+              </span>
+              <span *ngIf="product.productTypeId == 4" class="badge border border-secondary" style="width: 20px;
+              height: 20px;">
+                <nz-badge nzColor="#108ee9" style="margin-left:2px ;"></nz-badge>
+              </span>
+              <span *ngIf="product.productTypeId == 3" class="badge border border-warning" style="width: 20px;
+              height: 20px;">
+                <nz-badge nzStatus="warning" style="margin-left:2px ;"></nz-badge>
+              </span>
+              <strong> <a class="btn btn-sm btn-light" (click)="getproduct(product.id)" (click)="show = !show"
+                  style="color: #05b40e !important;font-size:16px;">
+                  {{product.name}}</a>
+              </strong>
+            </td>
+            <td>{{product?.description}}</td>
+            <td>{{product?.category?.description}}</td>
+            <td>{{product?.taxGroup?.description}}</td>
+            <td>&#8377; {{product?.price}}</td>
+            <td>
+              <a class="px-10">
+                <input type="checkbox" [(ngModel)]="product.isactive" (click)="active(product.id,!product.isactive)">
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+
+
+  <!-- Addd-Product && Edit Product -->
+
+  <div [hidden]="show" class="card" style="background-color: #f9f9f9;">
+    <div class="container-fluid py-4">
+
+      <div class="row" *ngIf="product">
+        <div class="col-6">
+          <strong *ngIf="!(product.id > 0)" class="text"
+            style="margin-left: 37px;font-size: 23px;font-family: 'Poppins', sans-serif;">Add Product</strong>
+          <strong *ngIf="product.id > 0" style="margin-left: 30px;"> <strong>Edit Product:</strong>
+            <a class="btn btn-sm btn-light" href="javascript: void(0);" class="text"
+              style="margin-left: 5px;font-size: 23px;font-family: 'Poppins', sans-serif;">
+              {{product?.description}}
+            </a> </strong>
+        </div>
+      </div>
+      <form name="form" id="prodForm" #f="ngForm" *ngIf="products1" novalidate>
+        <div class="row mt-4">
+          <div class="col-lg-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="font-weight-bolder">Product Image</h5>
+                <div class="row" style="margin-left: 69px;">
+                  <div class="image-div">
+                    <!-- liveimage -->
+                    <img *ngIf="products1.ImgUrl!=null" class="mt-20" style="border-radius: 25px;"
+                      src="{{products1.ImgUrl}}" alt="{{products1.Description}}" height=auto width="350">
+                    <button *ngIf="products1.ImgUrl!=null" class="btn" (click)="products1.ImgUrl = null">x</button>
+                    <!-- droppedimage -->
+                    <img id="droppedimage" *ngIf="blobimageurl!=null" class="mt-20" style="border-radius: 25px;"
+                      [src]=blobimageurl alt="{{products1.Description}}" height=auto width="350">
+                    <button *ngIf="blobimageurl!=null" class="btn" type="button" style="margin-bottom: 460px;"
+                      (click)="blobimageurl = null;image = null">x</button>
+                    <!-- emptyimage -->
+                    <img id="noimage" *ngIf="(products1.ImgUrl==null || products1.ImgUrl=='')&&blobimageurl==null"
+                      (click)="fileField.click()" class="mt-20" style="border: 10px solid white;border-radius: 63px;"
+                      src="assets/dist/img/Img-upload.jpg" alt="{{products1.Description}}" height=auto width="350"><br>
+                  </div> <br> <br>
+
+                  <div id="imageupload" class="fileupload" appDragDropFileUpload (click)="fileField.click()"
+                    (fileDropped)="upload($event)">
+                    <span class="ddinfo" > <strong> Choose a file</strong> or drag
+                      here</span>
+                    <input type="file" accept="image/*" name="avatars" #fileField (change)="upload($event.target.files)"
+                      hidden multiple>
+                  </div>
+                </div> <br><br>
+
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8 mt-lg-0 mt-4">
+
+            <div class="card" style="margin-bottom: 0;">
+              <div class="card-body">
+                <h5 class="font-weight-bolder">Product Information</h5>
+                <div class="row">
+                  <div class="col-md-3 mt-15" *ngFor="let item of productTypes">
+                    <div class="custom-control custom-radio mb-5">
+                      <input type="radio" [(ngModel)]="products1.ProductTypeId" [value]="item.id" id="{{item.id}}"
+                        name="{{item.description}}" class="custom-control-input">
+                      <label class="custom-control-label" for="{{item.id}}">{{item.description}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 col-sm-6">
+
+                    <label for="firstName"><strong>Product Name<span class="text-danger">*</span></strong></label>
+                    <input type="text" class="form-control" placeholder="Enter Product Name" name="name"
+                      autocomplete="off" [(ngModel)]="products1.Name" #name="ngModel"
+                      [ngClass]="{'is-invalid': submitted && products1.Name == ''}" required />
+                    <span *ngIf="submitted && products1.Name == ''" class="text-danger">Product name cannot be
+                      empty*</span>
+                    <!-- <div *ngIf="f.submitted && name.invalid" class="invalid-feedback">
+                      <div *ngIf="name.errors.required">Product Name is required</div> -->
+                    <!-- </div> -->
+
+
+                    <!-- <div class="mb-3">
+                      <span class="cui-crypto-dashboard-form-label">Product Name</span>
+                      <input type="text" class="form-control" [(ngModel)]="products1.Name" (input)="setcombinationname()"
+                        placeholder="Enter Product" [ngClass]="{'is-invalid': submitted && products1.Name == ''}" />
+                      <span *ngIf="submitted && products1.Name == ''" class="text-danger">Product name cannot be
+                        empty*</span>
+                    </div> -->
+
+
+
+                  </div>
+                  <div class="col-12 col-sm-6 mt-3 mt-sm-0">
+                    <label for="firstName"><strong>Barcode<span class="text-danger"></span></strong></label>
+                    <input type="text" class="form-control" placeholder="Enter Product Barcode" name="barcode"
+                      autocomplete="off" [(ngModel)]="products1.Barcode" />
+                    <div>
+
+                    </div>
+                  </div>
+                </div> <br>
+                <div class="row">
+                  <div class="col-3">
+                    <label for="firstName"><strong>Description<span class="text-danger">*</span></strong></label>
+                    <textarea class="form-control mt-15" name="description" [(ngModel)]="products1.Description" rows="3"
+                      [ngClass]="{'is-invalid': submitted && products1.Description == ''}" #description="ngModel"
+                      placeholder="Textarea"></textarea>
+                    <span *ngIf="submitted && products1.Description == ''" class="text-danger">Product Description
+                      cannot be
+                      empty*</span>
+                    <!-- <div *ngIf="f.submitted && description.invalid" class="invalid-feedback">
+                      <div *ngIf="description.errors.required">Description is required</div>
+                    </div> -->
+                  </div>
+                  <div class="col-3">
+                    <label for="firstName"><strong>Product Code</strong></label>
+                    <input type="text" class="form-control" placeholder="Enter Product Code" name="productCode"
+                      autocomplete="off" [(ngModel)]="products1.ProductCode" #productCode="ngModel" />
+                  </div>
+                  <div class="col-3">
+                    <label for="firstName"><strong>Sort Order</strong></label>
+                    <input type="number" class="form-control" placeholder="Enter Product SortOrder" name="sortOrder"
+                      [(ngModel)]="products1.SortOrder" #sortOrder="ngModel"
+                      [ngClass]="{'is-invalid': submitted && products1.SortOrder == ''}" required />
+                    <span *ngIf="submitted && products1.SortOrder == ''" class="text-danger">Sort-Order cannot be
+                      empty*</span>
+                    <!-- <div *ngIf="sortOrder.invalid" class="invalid-feedback">
+                      <div *ngIf="sortOrder.errors.required">SortOrder can't be empty!</div>
+                    </div> -->
+                  </div>
+                </div><br>
+                <div class="row">
+
+                  <div class="col-sm-6">
+                    <label for="firstName"><strong>Category</strong></label>
+                    <select class="form-control custom-select" [(ngModel)]="products1.CategoryId"
+                      [ngModelOptions]="{standalone: true}"
+                      [ngClass]="{'is-invalid': submitted && products1.CategoryId == ''}">
+                      <option value="0">Select Category</option>
+                      <option *ngFor="let item of categories" value="{{item.id}}">{{item.description}}</option>
+                    </select>
+                    <span *ngIf="submitted && products1.CategoryId == ''" class="text-danger">Category cannot be
+                      empty*</span>
+                    <!-- <div *ngIf="f.submitted && products1.CategoryId  == 0" class="invalid-feedback">
+                      <div *ngIf="products1.CategoryId  == 0">Product Name is required</div>
+                    </div> -->
+                  </div>
+                  <div class="col-12 col-sm-6 mt-3 mt-sm-0">
+                    <label for="firstName"><strong>TaxGroup</strong></label>
+                    <select class="form-control custom-select" [(ngModel)]="products1.TaxGroupId"
+                      [ngClass]="{'is-invalid': submitted && products1.TaxGroupId == ''}" name="taxName"
+                      [ngModelOptions]="{standalone: true}">
+                      <option value="0">Select TaxGroup</option>
+                      <option *ngFor="let item of taxgroups" value="{{item.id}}">{{item.description}}</option>
+                    </select>
+                    <span *ngIf="submitted && products1.TaxGroupId == ''" class="text-danger">Tax cannot be
+                      empty*</span>
+                  </div>
+                </div><br>
+                <div class="row">
+
+                  <div class="col-sm-6">
+                    <label for="firstName"><strong>Unit</strong></label>
+                    <select class="form-control custom-select" [(ngModel)]="products1.UnitId"
+                      [ngClass]="{'is-invalid': submitted && products1.UnitId == ''}"
+                      [ngModelOptions]="{standalone: true}">
+                      <option value="0">Select Unit</option>
+                      <option *ngFor="let item of units" value="{{item.id}}">{{item.description}}</option>
+                    </select>
+                    <span *ngIf="submitted && products1.UnitId == ''" class="text-danger">Unit cannot be
+                      empty*</span>
+                  </div>
+                  <div class="col-12 col-sm-6 mt-3 mt-sm-0">
+                    <label for="firstName"><strong>KOT Group</strong></label>
+                    <select class="form-control custom-select">
+                      <option value="0">Select Kot</option>
+                      <option value=0>No KOT Group</option>
+                      <option></option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-sm-4">
+            <div class="card">
+              <div class="card-body" *ngIf="products1">
+                <h5 class="font-weight-bolder">Option Groups</h5> <br>
+
+                <div class="row">
+
+                  <div class="col-4">
+                    <strong>Recommended</strong>
+                    <div class="col-sm-6" style="margin-top: 10px;margin-left: 30px;">
+                      <input type="checkbox" placeholder="Enter Product Recomended" name="Recomended"
+                        [(ngModel)]="products1.Recomended" #Recomended="ngModel" />
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <strong>&nbsp; IsSaleProdGroup</strong>
+                    <div class="col-sm-6" style="margin-top: 10px;margin-left: 30px;">
+                      <input type="checkbox" placeholder="Enter" name="isSaleProdGroup"
+                        [(ngModel)]="products1.IsSaleProdGroup" #isSaleProdGroup="ngModel" />
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <strong>&nbsp; StockMaintained</strong>
+                    <div class="col-sm-6" style="margin-top: 10px;margin-left: 30px;">
+                      <input type="checkbox" placeholder="Enter" name="isStockMaintained"
+                        [(ngModel)]="products1.IsStockMaintained" #isStockMaintained="ngModel" />
+                    </div>
+                  </div> <br>
+                </div><br>
+
+                <div class="row">
+                  <div class="col-12">
+                    <strong>Select Option Group</strong>
+                    <ng-multiselect-dropdown class="multiselect-dropdown dropdown-btn" #multiSelect
+                      [placeholder]="'Select OptionGroup'" [(ngModel)]="selectedItems" name="optionGroups"
+                      [data]="products.optionGroups" [settings]="settings" [disabled]="false"
+                      (onFilterChange)="onFilterChange($event)" (onSelect)="onItemSelect($event)"
+                      (onDeSelect)="onDeSelect($event)" (onSelectAll)="onSelectAll($event)"
+                      (onDeSelectAll)="onDeSelectAll($event)">
+                    </ng-multiselect-dropdown>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-8 mt-sm-0 mt-4" *ngIf="products1">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="font-weight-bolder">Pricing</h5> <br>
+                <div class="row">
+
+                  <div class="col-4">
+                    <strong>Min Quantity</strong>
+                    <input type="number" class="form-control" placeholder="Enter Product minquantity" name="minquantity"
+                      [(ngModel)]="products1.minquantity" #minquantity="ngModel" />
+
+                  </div>
+                  <div class="col-5">
+                    <strong>Min Block</strong>
+                    <input type="number" class="form-control" placeholder="Enter Product minblock" name="minblock"
+                      [(ngModel)]="products1.minblock" #minblock="ngModel" />
+                  </div>
+                </div><br>
+                <div class="row">
+                  <!-- <div class="col-12"> -->
+                  <div class="col-3">
+                    <strong>Dine Price</strong>
+                    <input type="number" class="form-control" placeholder="Enter Product Price" name="Price"
+                      [(ngModel)]="products1.Price" #Price="ngModel"
+                      [ngClass]="{'is-invalid': submitted && products1.Price == ''}" required />
+                    <span *ngIf="submitted && products1.Price == ''" class="text-danger">Price cannot be
+                      empty*</span>
+                    <!-- <div *ngIf="Price.invalid" class="invalid-feedback">
+                      <div *ngIf="Price.errors.required">Price can't be empty!</div>
+                    </div> -->
+                  </div>
+
+                  <div class="col-3">
+                    <strong>Takeaway Price</strong>
+                    <input type="number" class="form-control" placeholder="Enter Product Price" name="Price"
+                      [(ngModel)]="products1.TakeawayPrice" #TakeawayPrice="ngModel"
+                      [ngClass]="{'is-invalid': submitted && products1.TakeawayPrice == ''}" required />
+                    <span *ngIf="submitted && products1.TakeawayPrice == ''" class="text-danger">Price cannot be
+                      empty*</span>
+                    <!-- <div *ngIf="TakeawayPrice.invalid" class="invalid-feedback">
+                      <div *ngIf="TakeawayPrice.errors.required">Price can't be empty!</div>
+                    </div> -->
+                  </div>
+                  <div class="col-3">
+                    <strong>Delivery Price</strong>
+                    <input type="number" class="form-control" placeholder="Enter Product Price" name="Price"
+                      [(ngModel)]="products1.DeliveryPrice" #DeliveryPrice="ngModel"
+                      [ngClass]="{'is-invalid': submitted && products1.DeliveryPrice == ''}" required />
+                    <span *ngIf="submitted && products1.DeliveryPrice == ''" class="text-danger">Price cannot be
+                      empty*</span>
+                    <!-- <div *ngIf="DeliveryPrice.invalid" class="invalid-feedback">
+                      <div *ngIf="DeliveryPrice.errors.required">Price can't be empty!</div>
+                    </div> -->
+                  </div>
+                  <div class="col-3">
+                    <strong>Up Price</strong>
+                    <input type="number" class="form-control" placeholder="Enter Product Price" name="Price"
+                      [(ngModel)]="products1.UPPrice" #UPPrice="ngModel"
+                      [ngClass]="{'is-invalid': submitted && products1.UPPrice == ''}" required />
+                    <span *ngIf="submitted && products1.UPPrice == ''" class="text-danger">Price cannot be
+                      empty*</span>
+                    <!-- <div *ngIf="UPPrice.invalid" class="invalid-feedback">
+                      <div *ngIf="UPPrice.errors.required">Price can't be empty!</div>
+                    </div> -->
+                    <!-- </div> -->
+                  </div>
+                </div> <br>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div nz-row>
+        <div nz-col nzSpan="12"> <button class="btn btn-secondary btn-sm mx-10 w-10" (click)="back()"
+            style="margin-left:23px;height: 34px;"><i nz-icon nzType="left"
+              style="margin-right: 6px;"></i>Back</button>&nbsp;&nbsp;
+        </div>
+        <div nz-col nzSpan="12"> <button type="submit" class="btn btn-success btn-sm mx-10 w-10"
+            style="  height: 34px;    float: right;" (click)=" saveProduct()">Save
+            Product</button></div>
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+  <ng-template #contentdetail1 let-modal>
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+      <div class="modal-dialog ma-0" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <input type="file" class="btn-text" accept=".csv" (change)="csv2Array($event)" placeholder="Upload file">
+
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success btn-sm mx-10 w-20" (click)="Upload();modal.close()">Upload</button>
+            <button class="btn btn-danger btn-sm mx-10 w-20" (click)="modal.close()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </ng-template>
+  <ng-template #contentDetail2 let-modal>
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+      <div class="modal-dialog ma-0" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Options</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <input>
+              <label></label>
+              <br><br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #contentDetail3 let-modal>
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+      <div class="modal-dialog ma-0" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Addon Group</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <select #qwerty class="form-control custom-select">
+              <option>
+              </option>
+            </select>
+          </div>
+          <div class="modal-body">
+            <div class="col-sm-3">
+              <input type="checkbox" />
+              <strong></strong>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-danger btn-sm mx-10 w-20" data-dismiss="modal">Close</button>
+            <button class="btn btn-success btn-sm mx-10 w-20">Save
+              changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #contentDetail4 let-modal>
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+      <div class="modal-dialog ma-0" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Addon Group</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="col-sm-3">
+              <input type="checkbox" />
+              <strong></strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+
+  <ng-template #PopUp let-modal>
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+      <div class="modal-dialog ma-0" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Warning!!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Do you want to overwrite Optiongroups?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-danger btn-sm mx-10 w-20">No</button>
+            <button class="btn btn-success btn-sm mx-10 w-20">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,439 @@
+<div class="card">
+    <div class="card-body">
+
+        <div class="col-xl-12 row mb-20">
+            <div class="col-xl-3">
+                <label for="cars"><strong class="font-size-16">From:</strong> </label><br>
+                <div>
+                    <input style="height: 40px;font-size: initial;" type="time" [(ngModel)]="from"
+                        class="form-control form-control-sm col-xl-10">
+                </div>
+
+            </div>
+
+            <div class="col-xl-3">
+                <label for="cars"> <strong class="font-size-16">To:</strong> </label><br>
+                <input style="height: 40px;font-size: initial;" type="time" [(ngModel)]="to"
+                    class="form-control form-control-sm col-xl-10">
+            </div>
+            <div class="col-xl-3">
+                <label for="cars"><strong class="font-size-16">Margin:</strong> </label><br>
+                <input style="height: 40px;font-size: initial;" type="number"
+                    class="form-control form-control-sm col-xl-10" [(ngModel)]="diffMargin">
+            </div>
+            <div class="col-xl-1 mt-3">
+                <!-- <a href="javascript: void(0);" class="font-size-18 text-blue" (click)="getDenomReport()"> Report</a> -->
+
+                <button class="btn btn-link font-size-18 " (click)="getDenomReport()">Report</button>
+            </div>
+            <div class="col-xl-2 mt-3">
+                <!-- <a href="javascript: void(0);" class="font-size-18 " [disabled]="!storeid"
+                    (click)="openPettymodal()">Petty Cash
+                    Transfer</a> -->
+                <button class="btn btn-link font-size-18 " [disabled]="!storeid" (click)="openPettymodal()">Petty Cash
+                    Transfer</button>
+            </div>
+            <div class="col-xl-3 mt-4">
+                <label for="cars"><strong class="font-size-16">Choose a Store:</strong> </label><br>
+                <div>
+                    <ng-template class="w-100" #rt let-r="result" let-t="term">
+                        <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+                    </ng-template>
+                    <div style="height: 84%; position: relative;">
+                        <input id="typeahead-template" style="height: 40px;display: revert;" #instance="ngbTypeahead"
+                            type="text" class="form-control form-control-sm col-xl-10" [(ngModel)]="smodel"
+                            placeholder="Search Store..." [ngbTypeahead]="search" [resultTemplate]="rt"
+                            [inputFormatter]="formatter" (selectItem)="selectedItem($event.item)" />
+                        <span *ngIf="smodel != ''" class="search-clear" aria-hidden="true"
+                            (click)="smodel = '';storeid = 0">×</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 mt-4">
+                <label for="cars"><strong class="font-size-16">Choose an Entry Type:</strong> </label><br>
+                <select name="cars" id="cars" class="form-control form-control-sm col-xl-10" [(ngModel)]="entrytypeid"
+                    style="height: 40px;font-size: initial;">
+                    <option value="null">Select Entry-Type</option>
+                    <option value={{entrytype.id}} *ngFor="let entrytype of entrytypes">{{entrytype.type}}</option>
+                </select>
+            </div>
+            <div class="col-xl-3 mt-4">
+                <label for="cars"><strong class="font-size-16">Selec a date:</strong> </label><br>
+                <!-- <div class="mb-5"> -->
+                <input style="height: 40px;font-size: initial;" type="text" *ngIf="!showcalender"
+                    class="form-control form-control-sm col-xl-10" [(ngModel)]="displaydate"
+                    (focusin)="showcalender = true">
+                <ngb-datepicker #dp *ngIf="showcalender" [(ngModel)]="model" (ngModelChange)="onDateSelect($event)"
+                    (navigate)="date = $event.next"></ngb-datepicker>
+                <span style="margin-right: 26px;font-size: 30px;" *ngIf="showcalender" class="search-clear2"
+                    aria-hidden="true" (click)="showcalender = false">×</span>
+                <!-- </div> -->
+
+            </div>
+            <div class="col-xl-1 mt-5">
+                <button style="border-radius: 5px;" class="btn btn-success mt-2 w-75"
+                    (click)="getfetchentries()">Submit</button>
+            </div>
+            <div class="col-xl-1 mt-5">
+                <button style="border-radius: 5px;" class="btn btn-secondary mt-2 w-75"
+                    (click)="openCopymodal()">Copy</button>
+            </div>
+            <div class="col-xl-1 mt-5">
+                <button style="border-radius: 5px;" class="btn btn-danger mt-2 w-75" [disabled]="!storeid"
+                    (click)="open()">Entry</button>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<div class="col-xl-12">
+    <div class="accordion">
+        <div class="w-100" *ngFor="let denomentry of denomentries; let i = index;">
+            <div class="card-header" [ngClass]="{'edited' : denomentry.edited, 'bg-white' : !denomentry.edited}"
+                id="headingOne" (click)="denomentry.isCollapsed = !denomentry.isCollapsed"
+                [attr.aria-expanded]="denomentry.isCollapsed" aria-controls="collapseExample">
+                <div class="card-title ant-typography" style="font-size: large;"><span
+                        class="accordion-indicator pull-right"><i class="plus fe fe-plus"></i><span nz-icon
+                            nzType="down-circle" style="color: orange;" nzTheme="outline"></span></span>
+                    <i *ngIf="denomentry.edited" class="text-warning pull-right">This entry is edited. See
+                        <code>#{{denomentry.editid}}</code> for updated data.</i>
+                    <code>#{{denomentry.Id}}</code><a>{{denomentry.EntryDateTime | date: 'MMM d,
+                        y, h:mm a'}}
+                        by {{denomentry.UserName}} | <i>{{denomentry.storename}} | {{denomentry.Remarks}}
+                            {{denomentry.diff >= 0 ? denomentry.diff : denomentry.diff * -1}}</i>
+                    </a>
+
+                    <br>
+                    <span><i>{{
+                            denomentry.EntryTypeId == 1 ? 'Sent to Store' :
+                            denomentry.EntryTypeId == 2 ? 'Closing' :
+                            denomentry.EntryTypeId == 3 ? 'Expense Cash' :
+                            denomentry.EntryTypeId == 4 ? 'Closing Expense Cash' :
+                            denomentry.EntryTypeId == 5 ? 'Sales Cash' :
+                            denomentry.EntryTypeId == 6 ? 'Closing Sales Cash' : 'Regular'}}</i></span>
+                </div>
+            </div>
+            <div toggler="#headingOne" class="collapse" [ngbCollapse]="!denomentry.isCollapsed">
+                <div class="card-body col-xl-12 row">
+                    <div class="mb-5 col-xl-6">
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item" *ngFor="let entry of denomentry.Entries">
+                                Rs.{{entry.DenomName}} x {{entry.Count}}
+                                <span class="float-right">{{entry.Amount}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-xl-6" style="font-size: large;">
+                        <!-- <i class="text-warning">Contact your admin for more information</i> -->
+                        <strong>Opening Balance: </strong>
+                        <span>{{denomentry.OpeningBalance}}</span>
+                        <br>
+                        <strong>Sales Cash: </strong>
+                        <span>{{denomentry.SalesCash}}</span>
+                        <button *ngIf="denomentry.SalesCash&&!denomentry.showSalesTrnx"
+                            (click)="denomentry.showSalesTrnx = !denomentry.showSalesTrnx"
+                            class="btn btn-link text-success"><i class="fa fa-plus"></i></button>
+                        <button *ngIf="denomentry.showSalesTrnx"
+                            (click)="denomentry.showSalesTrnx = !denomentry.showSalesTrnx"
+                            class="btn btn-link text-danger"><i class="fa fa-minus"></i></button>
+                        <br>
+                        <div *ngIf="denomentry.showSalesTrnx" style="max-height: 300px; overflow: auto;">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Amount</th>
+                                        <th scope="col">Transaction Date Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let transaxn of denomentry.SalesTransaxns">
+                                        <td scope="row"><code>#{{ transaxn.InvoiceNo }}</code></td>
+                                        <td>{{ transaxn.Amount | number }}</td>
+                                        <td>{{ transaxn.TransDateTime | date: 'MMM d, y, h:mm a' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <strong>CashIn:
+                        </strong> <span>{{denomentry.CashIn}}</span>
+                        <button *ngIf="denomentry.CashIn&&!denomentry.showCashIn"
+                            (click)="denomentry.showCashIn = !denomentry.showCashIn"
+                            class="btn btn-link text-success"><i class="fa fa-plus"></i></button>
+                        <button *ngIf="denomentry.showCashIn" (click)="denomentry.showCashIn = !denomentry.showCashIn"
+                            class="btn btn-link text-danger"><i class="fa fa-minus"></i></button>
+                        <br>
+                        <div *ngIf="denomentry.showCashIn" style="max-height: 300px; overflow: auto;">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Amount</th>
+                                        <th scope="col">Transaction Date Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let transaxn of denomentry.CashInTransaxns">
+                                        <td scope="row"><code>#{{ transaxn.TransactionId }}</code></td>
+                                        <td>{{ transaxn.Name }}</td>
+                                        <td>{{ transaxn.Amount | number }}</td>
+                                        <td>{{ transaxn.TransDateTime | date: 'MMM d, y, h:mm a' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <strong>CashOut: </strong> <span>{{denomentry.CashOut}}</span>
+
+                        <button *ngIf="denomentry.CashOut&&!denomentry.showCashOut"
+                            (click)="denomentry.showCashOut = !denomentry.showCashOut"
+                            class="btn btn-link text-success"><i class="fa fa-plus"></i></button>
+                        <button *ngIf="denomentry.showCashOut"
+                            (click)="denomentry.showCashOut = !denomentry.showCashOut"
+                            class="btn btn-link text-danger"><i class="fa fa-minus"></i></button>
+                        <br>
+                        <div *ngIf="denomentry.showCashOut">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Amount</th>
+                                        <th scope="col">Transaction Date Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let transaxn of denomentry.CashOutTransaxns">
+                                        <td scope="row"><code>#{{ transaxn.TransactionId }}</code></td>
+                                        <td>{{ transaxn.Name }}</td>
+                                        <td>{{ transaxn.Amount | number }}</td>
+                                        <td>{{ transaxn.TransDateTime | date: 'MMM d, y, h:mm a' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <strong>Expected Balance: </strong>
+                        <span>{{denomentry.ExpectedBalance}}</span>
+                        <br>
+                        <strong>Actual Balance: </strong>
+                        <span>{{denomentry.TotalAmount}}</span> <br>
+                        <strong>Remarks: </strong> <span>{{denomentry.diff}}</span>
+                        <span
+                            [ngClass]="{'text-warning': denomentry.diff > 0, 'text-success': denomentry.diff == 0, 'text-danger': denomentry.diff < 0}">{{denomentry.Remarks}}</span><br>
+                        <strong *ngIf="denomentry.compared_value">Last compared difference: </strong>
+                        {{denomentry.compared_value}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #drawerTitle>
+    <span class="font-size-24">Denomination Entry</span>
+</ng-template>
+
+<nz-drawer [nzClosable]="true" [nzVisible]="visible" nzPlacement="right" [nzTitle]="liveSearchInput"
+    (nzOnClose)="close()" [nzWidth]="720">
+    <div class="col-xl-12 row">
+        <div class="col-xl-6 row">
+            <label style=" font-size: large;" for="cars"><strong>Choose an Entry Type:</strong>
+            </label>
+            <select name="cars" id="cars" class="form-control">
+                <option value=null>Regular</option>
+                <option value=1>Send to Store</option>
+                <option value=2>Closing</option>
+                <option value=3>Expense Cash</option>
+                <option value=4>Closing Expense Cash</option>
+                <option value=5>Sales Cash</option>
+                <option value=6>Closing Sales Cash</option>
+            </select> <br> <br>
+        </div>
+    </div> <br>
+    <div class="row">
+        <input style="height: 40px;font-size: initial;" type="date" [(ngModel)]="entrydatetime.date"
+            class="form-control form-control-sm col-xl-5">
+        <input style="height: 40px;font-size: initial;" type="time" [(ngModel)]="entrydatetime.time"
+            class="form-control form-control-sm col-xl-5">
+    </div><br><br>
+    <div class="col-xl-12 row">
+        <div class="col-xl-7 row">
+            <strong class="col-sm pl-1" style="margin-top: 15px;font-size: initial;">Denomination</strong>
+            <strong class="col-sm" style="margin-top: 15px;font-size: initial;">Count</strong>
+
+            <div class="row mb-2" *ngFor="let entry of denomEntry?.Entries">
+
+                <input type="text" class="form-control col-sm mx-1" style="width: 122px;"
+                    [(ngModel)]="'₹'+entry.DenomName" #denomination name="denomination" disabled>
+
+                <input type="number" [(ngModel)]="entry.Count" #count class="form-control col-sm mx-1"
+                    style="width: 122px;" #count name="count" (input)="calculate()">
+
+                <div>
+                    <button *ngIf="entry.Count > 0" (click)="entry.Count = null;calculate()"
+                        class="btn btn-link text-danger mx-1"><span nz-icon nzType="delete"
+                            nzTheme="outline"></span></button>
+                    <button *ngIf="!entry.Count || entry.Count <= 0" disabled class="btn btn-link text-white mx-1"><span
+                            nz-icon nzType="delete" nzTheme="outline"></span></button>
+                </div>
+            </div>
+        </div><br><br>
+        <div class="col-xl-5">
+            <div class="text-right">
+                <strong style="font-size: 16px;">Total Amount: <strong
+                        style="font-size: 18px;">{{denomEntry?.TotalAmount}} </strong>
+                </strong> <br>
+                <button class="btn btn-success" (click)="save()">Save</button>
+            </div>
+        </div>
+    </div>
+</nz-drawer>
+
+<!-- Petty cash-Model -->
+
+<ng-template #Petty_data_modal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" style="font-size: x-large;">Petty cash Transfer</h5>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col">
+                    <label for="cars"><strong class="font-size-16">Sales Cash:</strong> </label><br>
+                    <input type="number" class="form-control form-control-sm " readonly
+                        style="height: 40px;font-size: medium;" [(ngModel)]="store_petty_cash.salescash">
+                </div>
+                <div class="col">
+                    <label for="cars"><strong class="font-size-16">Expense Cash:</strong> </label><br>
+                    <input type="number" class="form-control form-control-sm " readonly
+                        style="height: 40px;font-size: medium;" [(ngModel)]="store_petty_cash.expensecash">
+                </div>
+            </div>
+            <hr style="margin-top: 20px;margin-bottom: 20px; border-top: 1px solid #e0e3e4;">
+
+            <div class="row">
+                <div class="col">
+                    <input type="number" class="form-control form-control-sm "
+                        (input)="store_petty_cash.fromExpense = null" [(ngModel)]="store_petty_cash.fromSales"
+                        style="height: 40px;width: 250px;font-size: medium;">
+                    <span *ngIf="store_petty_cash.fromSales > store_petty_cash.salescash"
+                        class="font-11 text-danger">*amount cannot exceed sales cash</span>
+                </div>
+                <div class="col-xl-2">
+
+                    <span *ngIf="store_petty_cash.fromSales > 0" class="zoom" style="font-size: x-large;color: orange;
+                            margin-left: 33px;    margin-top: 4px;"
+                        [disabled]="store_petty_cash.fromSales > store_petty_cash.salescash" (click)="transfer()"
+                        nz-icon nzType="right-circle" nzTheme="outline"></span>
+
+
+                    <span *ngIf="store_petty_cash.fromExpense > 0" class="zoom" style="font-size: x-large;color: orange;
+                        margin-left: 33px;    margin-top: 4px;"
+                        [disabled]="store_petty_cash.fromExpense > store_petty_cash.expensecash" (click)="transfer()"
+                        nz-icon nzType="left-circle" nzTheme="outline"></span>
+
+                </div>
+                <div class="col">
+                    <input type="number" (input)="store_petty_cash.fromSales = null"
+                        [(ngModel)]="store_petty_cash.fromExpense" class="form-control form-control-sm "
+                        style="height: 40px;width: 250px;float: right;font-size: medium;">
+                    <span *ngIf="store_petty_cash.fromExpense > store_petty_cash.expensecash"
+                        class="font-11 text-danger">*amount cannot exceed expense cash</span>
+                </div>
+            </div> <br>
+            <div>
+                <label for="cars"><strong class="font-size-16">Transfer Reason:</strong> </label><br>
+                <textarea class="form-control mt-15" [(ngModel)]="store_petty_cash.transferReason" cols="30" rows="2"
+                    placeholder="Textarea"></textarea> <br>
+                <span *ngIf="store_petty_cash.transferAmount > 0" style="font-size: large;">Transfer amount of
+                    <strong>Rs.{{store_petty_cash.transferAmount}}</strong>
+                    from <strong>
+                        {{
+                        store_petty_cash.to == "EXPENSE" ? "Sales" : "Expense"
+                        }}
+                        cash</strong> to <strong>
+                        {{
+                        store_petty_cash.to == "EXPENSE" ? "Expense" : "Sales"
+                        }} cash
+                    </strong></span>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+            (click)="cancelTransfer();modal.close('Save click')">Cancel</button>
+        <button type="button" class="btn btn-success" (click)="completeTransfer()">Transfer</button>
+    </div>
+</ng-template>
+
+<!-- Report-Model -->
+<ng-template #Report_data_modal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" style="font-size: x-large;">Report</h5>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="card-body">
+
+            <div class="col-xl-12 row ">
+                <div class="col-xl-6 ">
+                    <label for="cars" class="font-size-28">Bad Stores:</label><br>
+                    <textarea style="font-size: large;" [(ngModel)]="badStoresString" class="form-control mt-15"
+                        rows="10"></textarea>
+                </div>
+                <div class="col-xl-6 ">
+                    <label for="cars" class="font-size-28">Missing Stores: </label><br>
+                    <textarea style="font-size: large;" [(ngModel)]="missingStoresString" class="form-control mt-15"
+                        rows="10"></textarea>
+                </div>
+            </div> <br>
+            <div class="form-check ml-3">
+                <input class="form-check-input" style="height: 17px;width: 19px;" type="checkbox" value=""
+                    name="withDifference" [(ngModel)]="withDifference" (change)="genBadStoresString()">
+                <label class="form-check-label font-size-18 ml-2" for="withDifference">
+                    Show Difference
+                </label>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('')">Cancel</button>
+        <!-- <button type="button" class="btn btn-success" (click)="modal.close('')">Transfer</button> -->
+    </div>
+</ng-template>
+
+
+<!-- Copy-Model -->
+<ng-template #Copy_data_modal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" style="font-size: x-large;">Copy Data</h5>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="card-body">
+            <!-- <div class="row">
+                <span>Store---User----Remarks----Time</span>
+            </div> -->
+            <textarea #copyfield style=" font-size: large;" [(ngModel)]="copydata" class="form-control" cols="30"
+                rows="30">
+            </textarea>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('')">Cancel</button>
+        <!-- <button type="button" class="btn btn-success" (click)="modal.close('')">Transfer</button> -->
+    </div>
+</ng-template>

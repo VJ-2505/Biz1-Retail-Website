@@ -1,0 +1,25 @@
+.text {
+    text-transform: uppercase;
+    background: linear-gradient(to right, #e71493  0%, #330867 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  
+  }
+  .sort-header {
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  [data-kit-theme="default"] .ant-modal-confirm-body .ant-modal-confirm-title {
+    display: block;
+    overflow: hidden;
+    color: #595c97;
+    font-weight: 500;
+    font-size: 23px;
+    line-height: 1.4;
+}
